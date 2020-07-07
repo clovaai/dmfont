@@ -1,0 +1,11 @@
+torch==1.1.0
+torchvision==0.2.2
+h5py==2.9.0
+numpy==1.17.2
+Pillow==6.2.0
+sconf==0.2.1
+tqdm==4.47.0
+tensorboard==2.0.0
+tensorboardX==1.9
+fontTools==4.12.1
+fire==0.2.1

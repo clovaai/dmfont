@@ -1,0 +1,60 @@
+# train
+data_dir: data/fonts-hdf5
+data_meta: meta/kor_split.json
+language: kor
+batch_size: 12
+max_iter: 200000
+seed: 2
+g_lr: 2e-4
+d_lr: 8e-4
+n_workers: 2
+adam_betas: [0.0, 0.9]
+init: kaiming
+
+# dataset
+# n_sample is the range of #targets per style chunk (T style chars)
+dset_args:
+  n_sample_min: 1
+  n_sample_max: 4
+
+# model
+C: 32
+g_args:
+  comp_enc:
+    norm: none
+    activ: relu
+    pad_type: zero
+    sa:
+      C_qk_ratio: 0.5
+      n_heads: 2
+      area: False
+      ffn_mult: 2
+  dec:
+    norm: IN
+    activ: relu
+    pad_type: zero
+d_args:
+  w_norm: spectral
+  use_rx: false
+  activ: relu
+  gap_activ: relu
+  pad_type: zero
+ac_args:
+  norm: IN
+  activ: relu
+  pad_type: zero
+  conv_dropout: 0.3
+  clf_dropout: 0.2
+
+# losses
+pixel_w: 0.1
+gan_w: 1.0
+fm_w: 1.0
+ac_w: 0.1
+
+# etc
+save: all-last
+print_freq: 1000
+val_freq: 10000
+save_freq: 50000
+tb_freq: 10

@@ -1,0 +1,8 @@
+data_dir: data/thai-hdf5-fix2
+data_meta: meta/thai_split.json
+language: thai
+
+g_lr: 5e-5
+d_lr: 1e-4
+max_iter: 250000
+batch_size: 10
