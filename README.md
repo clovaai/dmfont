@@ -2,7 +2,7 @@
 
 <p align="center"><img width="80%" src="assets/teaser.jpg" /></p>
 
-Official PyTorch implementation of DM-Font | [Paper](https://arxiv.org/abs/2005.10510)
+Official PyTorch implementation of DM-Font | [Paper](https://arxiv.org/abs/2005.10510) | [Video on ECCV 2020](https://youtu.be/VMrMJf21XEA)
 
 Junbum Cha, Sanghyuk Chun, Gayoung Lee, Bado Lee, Seonghyeon Kim, Hwalsuk Lee.  
 Clova AI Research, NAVER Corp.  
