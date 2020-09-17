@@ -97,7 +97,7 @@ python evaluator.py $NAME $CHECKPOINT_PATH $OUT_DIR cfgs/kor.yaml --mode user-st
 ```
 @inproceedings{cha2020dmfont,
     title={Few-shot Compositional Font Generation with Dual Memory},
-    author={Cha, Junbum and Chun, Sanghyuk and Lee, Gayoung and Lee, Bado Lee and Kim, Seonghyeon and Lee, Hwalsuk},
+    author={Cha, Junbum and Chun, Sanghyuk and Lee, Gayoung and Lee, Bado and Kim, Seonghyeon and Lee, Hwalsuk},
     year={2020},
     booktitle={European Conference on Computer Vision (ECCV)},
 }
