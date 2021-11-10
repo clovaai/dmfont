@@ -1,5 +1,7 @@
 ## Few-shot Compositional Font Generation with Dual Memory (ECCV'20)
 
+**NOTICE: We release the unified few-shot font generation repository ([clovaai/fewshot-font-generation](https://github.com/clovaai/fewshot-font-generation)). If you are interested in using our implementation, please visit the unified repository.**
+
 <p align="center"><img width="80%" src="assets/teaser.jpg" /></p>
 
 Official PyTorch implementation of DM-Font | [Paper](https://arxiv.org/abs/2005.10510) | [Video on ECCV 2020](https://youtu.be/VMrMJf21XEA)
@@ -19,6 +21,7 @@ You can find more related projects on the few-shot font generation at the follow
 - [clovaai/dmfont](https://github.com/clovaai/dmfont) (ECCV'20) | [paper](https://arxiv.org/abs/2005.10510)
 - [clovaai/lffont](https://github.com/clovaai/lffont) (AAAI'21) | [paper](https://arxiv.org/abs/2009.11042)
 - [clovaai/mxfont](https://github.com/clovaai/mxfont) (ICCV'21) | [paper](https://arxiv.org/abs/2104.00887)
+- [clovaai/fewshot-font-generation](https://github.com/clovaai/fewshot-font-generation) The unified few-shot font generation repository
 
 ## Installation
 
