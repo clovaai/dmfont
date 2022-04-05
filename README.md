@@ -62,10 +62,10 @@ python -m scripts.prepare_dataset thai $FONTSDIR meta/thai_split.json $DUMPDIR
 
 ### Pretrained models
 
-For convenience, the minimal size checkpoints are provided by excluding training variables, e.g., momentums in optimizer, discriminator, or non-EMA generator.
+For convenience, the minimal size checkpoints are provided by excluding training variables, e.g., momentums in optimizer, discriminator, and non-EMA generator.
 
-- [Checkpoint trained on the Korean-handwriting dataset (Google drive)](https://drive.google.com/file/d/1y_8XDNtawtA2P7-pHbCQ3yGEcFX-9H1R/view?usp=sharing)
-- [Checkpoint trained on the Thai-printing dataset (Google drive)](https://drive.google.com/file/d/1z_MqlCiq_7aMo7Rugn_jMOUbAmCLM4Up/view?usp=sharing)
+- [Checkpoint trained on the Korean-handwriting dataset](https://github.com/clovaai/dmfont/releases/download/v1.0.0/korean-handwriting.pth)
+- [Checkpoint trained on the Thai-printing dataset](https://github.com/clovaai/dmfont/releases/download/v1.0.0/thai-printing.pth)
 
 
 ### Training
