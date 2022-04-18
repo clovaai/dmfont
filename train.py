@@ -67,20 +67,28 @@ def get_val_dset_loader(data, avail_fonts, avail_chars, trn_avail_chars, transfo
 
 
 def setup_args_and_config():
-    parser = argparse.ArgumentParser('MaHFG')
-    parser.add_argument("name")
-    parser.add_argument("config_paths", nargs="+")
-    parser.add_argument("--show", action="store_true", default=False)
-    parser.add_argument("--resume", default=None)
+    # 아무튼 얘네들은 나중에 args들을 args.log_lv같이 변수처럼 접근할 수 있음. 
+    # 그래서 해당 config들을 이용해 코드가 진행됨.
+    parser = argparse.ArgumentParser('MaHFG') #Prog 인수를 MaHFG로 변경함 → 별 뜻 없음 시발
+    parser.add_argument("name") 
+    parser.add_argument("config_paths", nargs="+") 
+    parser.add_argument("--show", action="store_true", default=False) 
+    parser.add_argument("--resume", default=None) 
     parser.add_argument("--log_lv", default='info')
     parser.add_argument("--debug", default=False, action="store_true")
     parser.add_argument("--tb-image", default=False, action="store_true",
-                        help="Write image log to tensorboard")
-    parser.add_argument("--deterministic", default=False, action="store_true")
+                        help="Write image log to tensorboard") # image를 tensorboard로 시각화 함.
+                        # 우리는 아마 이 옵션을 쓰지 않거나 wandb 혹은 tb에 기록하면서 하면 좋을 듯?
+    parser.add_argument("--deterministic", default=False, action="store_true") # 잘 모르겠음
 
+
+    # parse_known_args는 populated namespace와 remaining argument string을 가지는 tuple이 return 됨
+    # 즉 위에서 지정해서 나온 argument들은 왼쪽에 추가적으로 argparsing된 애들은 오른쪽에 담겨짐.
     args, left_argv = parser.parse_known_args()
+    # args의 name변수가 끝이 yaml로 끝나지 않으면 runtime error
     assert not args.name.endswith(".yaml")
 
+    
     cfg = Config(*args.config_paths, colorize_modified_item=True)
     cfg.argv_update(left_argv)
 
