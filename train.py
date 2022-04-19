@@ -88,7 +88,10 @@ def setup_args_and_config():
     # args의 name변수가 끝이 yaml로 끝나지 않으면 runtime error
     assert not args.name.endswith(".yaml")
 
-    
+    # sconf git을 들어가니 해당 파일을 실행할 때 argparser처럼 Config를 추가해주는 것 같음.
+    # 즉 대체적으로 잘 변하는 것 argparser로 안 변하는 것들은 sconf로 config_path의 file을 이용해 추가하는 것 같음.
+    # 나는 이걸 config parser로 사용했었음. 
+    # cfg를 찍어보니 dict type으로 yaml의 config들을 불러와서 접근할 수 있게 되어있음. 말 그대로 config가 됨.
     cfg = Config(*args.config_paths, colorize_modified_item=True)
     cfg.argv_update(left_argv)
 
@@ -103,10 +106,13 @@ def setup_args_and_config():
         args.tb_image = True
         args.log_lv = 'debug'
 
+    # OS에 맞게 Path가 수정됨 
     cfg['data_dir'] = Path(cfg['data_dir'])
 
+    # validation마다 save가 될 지 말지를 결정해야하므로 % 연산의 값이 0이 나와야 함.
     assert cfg['save_freq'] % cfg['val_freq'] == 0
 
+    # CLI로 넣은 args와 config를 저장한 cfg
     return args, cfg
 
 

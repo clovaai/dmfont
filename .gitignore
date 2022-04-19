@@ -22,3 +22,5 @@ fonts
 test_cv/
 test_us/
 practice.py
+.gitignore
+output.txt
