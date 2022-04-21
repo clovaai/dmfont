@@ -2,6 +2,7 @@
 DMFont
 Copyright (c) 2020-present NAVER Corp.
 MIT license
+
 """
 import sys
 import json
