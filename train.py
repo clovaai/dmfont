@@ -28,6 +28,7 @@ from evaluator import Evaluator
 
 
 def get_dset_loader(data, avail_fonts, avail_chars, transform, shuffle, cfg, content_font=None):
+    # 정해진 config와 args 등등을 이용해 실험을 위한 train dataloader 정의하고 instance화 함.
     dset, collate_fn = get_ma_dataset(
         data,
         avail_fonts,
@@ -45,6 +46,7 @@ def get_dset_loader(data, avail_fonts, avail_chars, transform, shuffle, cfg, con
 
 def get_val_dset_loader(data, avail_fonts, avail_chars, trn_avail_chars, transform,
                         batch_size, n_workers=2, n_max_match=3, content_font=None, language=None):
+    # 정해진 config와 args 등등을 이용해 실험을 위한 validation dataloader 정의하고 instance화 함.
     style_avails = {
         font_name: trn_avail_chars for font_name in avail_fonts
     }
@@ -85,6 +87,7 @@ def setup_args_and_config():
     # parse_known_args는 populated namespace와 remaining argument string을 가지는 tuple이 return 됨
     # 즉 위에서 지정해서 나온 argument들은 왼쪽에 추가적으로 argparsing된 애들은 오른쪽에 담겨짐.
     args, left_argv = parser.parse_known_args()
+
     # args의 name변수가 끝이 yaml로 끝나지 않으면 runtime error
     assert not args.name.endswith(".yaml")
 
@@ -117,6 +120,8 @@ def setup_args_and_config():
 
 
 def setup_language_dependent(cfg):
+    # 언어에 따른 content_font가 정해짐
+    # 그럼 content_font가 왜 .ttf 파일로 정해지나? 
     if cfg['language'] == 'kor':
         content_font = "NanumBarunpenR.ttf"
         n_comp_types = 3  # cho, jung, jong
@@ -132,6 +137,7 @@ def setup_language_dependent(cfg):
 
 
 def setup_data(cfg, val_transform):
+    # HDF5 형식의 Data와 Meta data를 들고 옴.
     """ setup data, meta_data, and check cross-validation flag
 
     Return (tuple): (data, meta_data)
@@ -148,6 +154,11 @@ def setup_data(cfg, val_transform):
 
 
 def setup_cv_dset_loader(hdf5_data, meta, val_transform, n_comp_types, content_font, cfg):
+    # cv관련 dataset과 dataloader에 관한 설정들을 setup 하는 함수. 
+    # font는 안 봤지만 character는 봤을 때
+    # font는 안 봤지만 character는 봤을 때
+    # font도 안보고 character도 안 봤을 때
+    # 위 3경우의 수로 validation을 측정 함.
     trn_chars = meta['train']['chars']
     batch_size = cfg['batch_size'] * 3
     n_workers = cfg['n_workers']
@@ -183,6 +194,7 @@ def main():
     ############################
     args, cfg = setup_args_and_config()
 
+    # argument들을 찍어줌. 
     if args.show:
         print("### Run Argv:\n> {}".format(' '.join(sys.argv)))
         print("### Run Arguments:")
@@ -191,16 +203,20 @@ def main():
         print("### Configs:")
         print(cfg.dumps())
         sys.exit()
-
+    
+    # time stamp를 찍기 위한 timestamp 변수 선언
     timestamp = utils.timestamp()
     unique_name = "{}_{}".format(timestamp, args.name)
+    # config 변수에 unique_name과 name을 등록함.
     cfg['unique_name'] = unique_name  # for save directory
     cfg['name'] = args.name
 
+    # 현재 작업경로에 Logs를 만듦. 
     utils.makedirs('logs')
     utils.makedirs(Path('checkpoints', unique_name))
 
     # logger
+    # logger는 개념이 조금 난해할 수도? 있음 그래도 관련되어서 블로그가 많으니까 느낌만 이해하면 될 듯
     logger_path = Path('logs', f"{unique_name}.log")
     logger = Logger.get(file_path=logger_path, level=args.log_lv, colorize=True)
 
@@ -208,23 +224,28 @@ def main():
     image_scale = 0.6
     writer_path = Path('runs', unique_name)
     if args.tb_image:
+        # TBWriter는 TensorBoardWriter인 듯 함.
         writer = utils.TBWriter(writer_path, scale=image_scale)
     else:
+        # TBDisckWriter는 뭔가 다른거 같음. 아직은 안 중요하니까 pass
         image_path = Path('images', unique_name)
         writer = utils.TBDiskWriter(writer_path, image_path, scale=image_scale)
 
     # log default informations
+    # sys, args, cfg, unique_name에 대해서 logging을 함
     args_str = dump_args(args)
     logger.info("Run Argv:\n> {}".format(' '.join(sys.argv)))
     logger.info("Args:\n{}".format(args_str))
     logger.info("Configs:\n{}".format(cfg.dumps()))
     logger.info("Unique name: {}".format(unique_name))
 
-    # seed
+    # seed 
+    # 정해진 seed 고정
     np.random.seed(cfg['seed'])
     torch.manual_seed(cfg['seed'])
     random.seed(cfg['seed'])
-
+    
+    # args.deterministic은 seed 고정에 굉장히 중요한 역할인 듯 함. 정확한 동작방식은 잘 모름
     if args.deterministic:
         #  https://discuss.pytorch.org/t/how-to-get-deterministic-behavior/18177/16
         #  https://pytorch.org/docs/stable/notes/randomness.html
@@ -243,29 +264,36 @@ def main():
     logger.info("Get dataset ...")
 
     # setup language dependent values
+    # config에 맞는 landguage dependent를 만듦
     content_font, n_comp_types, n_comps = setup_language_dependent(cfg)
 
     # setup transform
+    # transform을 dataset 차원에서 적용하기 위한 transform 함수 정의
     transform = transforms.Compose([
         transforms.ToTensor(),
         transforms.Normalize([0.5], [0.5])
     ])
 
     # setup data
+    # meta Data와 실제 data를 가져옴
+    # 아마 hdf5_data는 손글씨 Image가 아닐까 싶음.
     hdf5_data, meta = setup_data(cfg, transform)
 
     # setup dataset
+    # train 관련 dataset 정의
     trn_dset, loader = get_dset_loader(
         hdf5_data, meta['train']['fonts'], meta['train']['chars'], transform, True, cfg,
         content_font=content_font
     )
 
+    # logger를 이용해 dataset의 항목들을 logging 함.
     logger.info("### Training dataset ###")
     logger.info("# of avail fonts = {}".format(trn_dset.n_fonts))
     logger.info(f"Total {len(loader)} iterations per epochs")
     logger.info("# of avail items = {}".format(trn_dset.n_avails))
     logger.info(f"#fonts = {trn_dset.n_fonts}, #chars = {trn_dset.n_chars}")
 
+    # validation datalodaer 정의
     val_loaders = setup_cv_dset_loader(
         hdf5_data, meta, transform, n_comp_types, content_font, cfg
     )
@@ -276,6 +304,7 @@ def main():
     ufuc_loader = val_loaders['UnseenFonts-UnseenChars']
     ufuc_dset = ufuc_loader.dataset
 
+    # validation에 관련된 logging 수행
     logger.info("### Cross-validation datasets ###")
     logger.info(
         "Seen fonts, Unseen chars | "
@@ -295,16 +324,20 @@ def main():
     ############################
     logger.info("Build model ...")
     # generator
+    # generator 관련된 args와 config들을 이용해 생성함.
     g_kwargs = cfg.get('g_args', {})
     gen = MACore(
         1, cfg['C'], 1, **g_kwargs, n_comps=n_comps, n_comp_types=n_comp_types,
         language=cfg['language']
     )
+    # GPU연산을 위해 얹음. 
     gen.cuda()
     gen.apply(weights_init(cfg['init']))
 
+    # discriminator와 관련된 args와 config들을 이용해 생성함.
     d_kwargs = cfg.get('d_args', {})
     disc = Discriminator(cfg['C'], trn_dset.n_fonts, trn_dset.n_chars, **d_kwargs)
+    # GPU연산을 위해 얹음. 
     disc.cuda()
     disc.apply(weights_init(cfg['init']))
 
@@ -333,6 +366,7 @@ def main():
     ############################
     # setup validation
     ############################
+    # Evaluator라는 것을 이용해 실제 validation을 진행함.
     evaluator = Evaluator(
         hdf5_data, trn_dset.avails, logger, writer, cfg['batch_size'],
         content_font=content_font, transform=transform, language=cfg['language'],
@@ -345,10 +379,13 @@ def main():
     ############################
     # start training
     ############################
+    # Trainer 객체를 이용해 train을 진행함.
+    # Trainter instance화 하는 코드
     trainer = Trainer(
         gen, disc, g_optim, d_optim, aux_clf, ac_optim,
         writer, logger, evaluator, cfg
     )
+    # Trainer의 train 메소드를 이용해 실험함.
     trainer.train(loader, st_step)
 
 
