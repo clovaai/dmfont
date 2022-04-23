@@ -295,7 +295,6 @@ def main():
         hdf5_data, meta['train']['fonts'], meta['train']['chars'], transform, True, cfg,
         content_font=content_font
     )
-
     # logger를 이용해 dataset의 항목들을 logging 함.
     logger.info("### Training dataset ###")
     logger.info("# of avail fonts = {}".format(trn_dset.n_fonts))
