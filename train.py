@@ -71,20 +71,28 @@ def get_val_dset_loader(data, avail_fonts, avail_chars, trn_avail_chars, transfo
 
 
 def setup_args_and_config():
-    # 아무튼 얘네들은 나중에 args들을 args.log_lv같이 변수처럼 접근할 수 있음. 
+    # 아무튼 얘네들은 나중에 args들을 args.log_lv같이 변수처럼 접근할 수 있음.
     # 그래서 해당 config들을 이용해 코드가 진행됨.
-    parser = argparse.ArgumentParser('MaHFG') #Prog 인수를 MaHFG로 변경함 → 별 뜻 없음 시발
-    parser.add_argument("name") 
-    parser.add_argument("config_paths", nargs="+") 
-    parser.add_argument("--show", action="store_true", default=False) 
-    parser.add_argument("--resume", default=None) 
+
+    # Prog 인수를 MaHFG로 변경함 → 별 뜻 없음 시발
+    parser = argparse.ArgumentParser('MaHFG')
+    parser.add_argument("name")
+
+    # nargs -> 인수의 갯수 지정, + -> 1개 이상의 값을 전부 받아들인다.
+    parser.add_argument("config_paths", nargs="+")
+
+    # action = "store_true" 하면 나중에 인수를 주었을 때, args.show가 True가 됨. 인수를 안 주면, arg.show가 False(Default)
+    parser.add_argument("--show", action="store_true", default=False)
+
+    parser.add_argument("--resume", default=None)
     parser.add_argument("--log_lv", default='info')
     parser.add_argument("--debug", default=False, action="store_true")
-    parser.add_argument("--tb-image", default=False, action="store_true",
-                        help="Write image log to tensorboard") # image를 tensorboard로 시각화 함.
-                        # 우리는 아마 이 옵션을 쓰지 않거나 wandb 혹은 tb에 기록하면서 하면 좋을 듯?
-    parser.add_argument("--deterministic", default=False, action="store_true") # 잘 모르겠음
 
+    # image를 tensorboard로 시각화 함.
+    parser.add_argument("--tb-image", default=False, action="store_true",
+                        help="Write image log to tensorboard")
+    # seed 고정
+    parser.add_argument("--deterministic", default=False, action="store_true")
 
     # parse_known_args는 populated namespace와 remaining argument string을 가지는 tuple이 return 됨
     # 즉 위에서 지정해서 나온 argument들은 왼쪽에 추가적으로 argparsing된 애들은 오른쪽에 담겨짐.
@@ -93,10 +101,7 @@ def setup_args_and_config():
     # args의 name변수가 끝이 yaml로 끝나지 않으면 runtime error
     assert not args.name.endswith(".yaml")
 
-    # sconf git을 들어가니 해당 파일을 실행할 때 argparser처럼 Config를 추가해주는 것 같음.
-    # 즉 대체적으로 잘 변하는 것 argparser로 안 변하는 것들은 sconf로 config_path의 file을 이용해 추가하는 것 같음.
-    # 나는 이걸 config parser로 사용했었음. 
-    # cfg를 찍어보니 dict type으로 yaml의 config들을 불러와서 접근할 수 있게 되어있음. 말 그대로 config가 됨.
+    # Config 파일을 CLI에 입력한대로 수정
     cfg = Config(*args.config_paths, colorize_modified_item=True)
     cfg.argv_update(left_argv)
 
@@ -111,7 +116,7 @@ def setup_args_and_config():
         args.tb_image = True
         args.log_lv = 'debug'
 
-    # OS에 맞게 Path가 수정됨 
+    # OS에 맞게 Path가 수정됨
     cfg['data_dir'] = Path(cfg['data_dir'])
 
     # validation마다 save가 될 지 말지를 결정해야하므로 % 연산의 값이 0이 나와야 함.
@@ -123,7 +128,7 @@ def setup_args_and_config():
 
 def setup_language_dependent(cfg):
     # 언어에 따른 content_font가 정해짐
-    # 그럼 content_font가 왜 .ttf 파일로 정해지나? 
+    # 그럼 content_font가 왜 .ttf 파일로 정해지나?
     if cfg['language'] == 'kor':
         content_font = "NanumBarunpenR.ttf"
         n_comp_types = 3  # cho, jung, jong
@@ -156,7 +161,7 @@ def setup_data(cfg, val_transform):
 
 
 def setup_cv_dset_loader(hdf5_data, meta, val_transform, n_comp_types, content_font, cfg):
-    # cv관련 dataset과 dataloader에 관한 설정들을 setup 하는 함수. 
+    # cv관련 dataset과 dataloader에 관한 설정들을 setup 하는 함수.
     # font는 안 봤지만 character는 봤을 때
     # font는 안 봤지만 character는 봤을 때
     # font도 안보고 character도 안 봤을 때
@@ -196,16 +201,18 @@ def main():
     ############################
     args, cfg = setup_args_and_config()
 
-    # argument들을 찍어줌. 
+    # argument들을 찍어줌.
     if args.show:
         print("### Run Argv:\n> {}".format(' '.join(sys.argv)))
         print("### Run Arguments:")
+	    # args(argparse.Namespace) 들을 출력 가능한 string으로 바꾸어 줌
         s = dump_args(args)
         print(s + '\n')
         print("### Configs:")
+	    # config들을 출력 가능한 string으로 바꾸어 줌
         print(cfg.dumps())
         sys.exit()
-    
+
     # time stamp를 찍기 위한 timestamp 변수 선언
     timestamp = utils.timestamp()
     unique_name = "{}_{}".format(timestamp, args.name)
@@ -213,14 +220,15 @@ def main():
     cfg['unique_name'] = unique_name  # for save directory
     cfg['name'] = args.name
 
-    # 현재 작업경로에 Logs를 만듦. 
+    # 현재 작업경로에 Logs를 만듦.
     utils.makedirs('logs')
     utils.makedirs(Path('checkpoints', unique_name))
 
     # logger
     # logger는 개념이 조금 난해할 수도? 있음 그래도 관련되어서 블로그가 많으니까 느낌만 이해하면 될 듯
     logger_path = Path('logs', f"{unique_name}.log")
-    logger = Logger.get(file_path=logger_path, level=args.log_lv, colorize=True)
+    logger = Logger.get(file_path=logger_path,
+                        level=args.log_lv, colorize=True)
 
     # writer
     image_scale = 0.6
@@ -241,12 +249,12 @@ def main():
     logger.info("Configs:\n{}".format(cfg.dumps()))
     logger.info("Unique name: {}".format(unique_name))
 
-    # seed 
+    # seed
     # 정해진 seed 고정
     np.random.seed(cfg['seed'])
     torch.manual_seed(cfg['seed'])
     random.seed(cfg['seed'])
-    
+
     # args.deterministic은 seed 고정에 굉장히 중요한 역할인 듯 함. 정확한 동작방식은 잘 모름
     if args.deterministic:
         #  https://discuss.pytorch.org/t/how-to-get-deterministic-behavior/18177/16
@@ -332,14 +340,15 @@ def main():
         1, cfg['C'], 1, **g_kwargs, n_comps=n_comps, n_comp_types=n_comp_types,
         language=cfg['language']
     )
-    # GPU연산을 위해 얹음. 
+    # GPU연산을 위해 얹음.
     gen.cuda()
     gen.apply(weights_init(cfg['init']))
 
     # discriminator와 관련된 args와 config들을 이용해 생성함.
     d_kwargs = cfg.get('d_args', {})
-    disc = Discriminator(cfg['C'], trn_dset.n_fonts, trn_dset.n_chars, **d_kwargs)
-    # GPU연산을 위해 얹음. 
+    disc = Discriminator(cfg['C'], trn_dset.n_fonts,
+                         trn_dset.n_chars, **d_kwargs)
+    # GPU연산을 위해 얹음.
     disc.cuda()
     disc.apply(weights_init(cfg['init']))
 
@@ -353,15 +362,18 @@ def main():
         assert cfg['ac_gen_w'] == 0., "ac_gen loss is only available with ac loss"
 
     # setup optimizer
-    g_optim = optim.Adam(gen.parameters(), lr=cfg['g_lr'], betas=cfg['adam_betas'])
-    d_optim = optim.Adam(disc.parameters(), lr=cfg['d_lr'], betas=cfg['adam_betas'])
+    g_optim = optim.Adam(
+        gen.parameters(), lr=cfg['g_lr'], betas=cfg['adam_betas'])
+    d_optim = optim.Adam(
+        disc.parameters(), lr=cfg['d_lr'], betas=cfg['adam_betas'])
     ac_optim = optim.Adam(aux_clf.parameters(), lr=cfg['g_lr'], betas=cfg['adam_betas']) \
-               if aux_clf is not None else None
+        if aux_clf is not None else None
 
     # resume checkpoint
     st_step = 1
     if args.resume:
-        st_step, loss = load_checkpoint(args.resume, gen, disc, aux_clf, g_optim, d_optim, ac_optim)
+        st_step, loss = load_checkpoint(
+            args.resume, gen, disc, aux_clf, g_optim, d_optim, ac_optim)
         logger.info("Resumed checkpoint from {} (Step {}, Loss {:7.3f})".format(
             args.resume, st_step-1, loss))
 
