@@ -209,11 +209,12 @@ def main():
         s = dump_args(args)
         print(s + '\n')
         print("### Configs:")
-	    # config들을 출력 가능한 string으로 바꾸어 줌
+	    # config들을 Dump to colorized string
         print(cfg.dumps())
         sys.exit()
 
     # time stamp를 찍기 위한 timestamp 변수 선언
+    # 아ㅋㅋ 근데 utils라는 module이 따로 있는 줄 알았는데 알고 보니, 같은 경로 상의 utils 폴더를 의미 하는 거엿음ㅋㅋㅅㅂ
     timestamp = utils.timestamp()
     unique_name = "{}_{}".format(timestamp, args.name)
     # config 변수에 unique_name과 name을 등록함.
@@ -226,6 +227,7 @@ def main():
 
     # logger
     # logger는 개념이 조금 난해할 수도? 있음 그래도 관련되어서 블로그가 많으니까 느낌만 이해하면 될 듯
+    # 그냥 Path()를 통해 logger_path를 지정하고, 해당 경로에 logging을 하겠다고 선언
     logger_path = Path('logs', f"{unique_name}.log")
     logger = Logger.get(file_path=logger_path,
                         level=args.log_lv, colorize=True)
@@ -234,10 +236,10 @@ def main():
     image_scale = 0.6
     writer_path = Path('runs', unique_name)
     if args.tb_image:
-        # TBWriter는 TensorBoardWriter인 듯 함.
+        # TBWriter는 TensorBoardWriter를 의미.
         writer = utils.TBWriter(writer_path, scale=image_scale)
     else:
-        # TBDisckWriter는 뭔가 다른거 같음. 아직은 안 중요하니까 pass
+        # TBDisckWriter는 그냥 로컬에 쓴다는 것 같음.
         image_path = Path('images', unique_name)
         writer = utils.TBDiskWriter(writer_path, image_path, scale=image_scale)
 
